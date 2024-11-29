@@ -1,0 +1,53 @@
+const express = require('express');
+const cors = require('cors');
+
+const app = express();
+const port = 5000;
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// Simulación de base de datos en memoria
+let tareas = []; // Array para almacenar tareas
+
+// Rutas CRUD
+
+// Obtener todas las tareas
+app.get('/api/tareas', (req, res) => {
+  res.json(tareas);
+});
+
+// Crear una nueva tarea
+app.post('/api/tareas', (req, res) => {
+  const { nombre } = req.body;
+  const nuevaTarea = { id: Date.now(), nombre }; // Crea una tarea con un ID único
+  tareas.push(nuevaTarea);
+  res.status(201).json(nuevaTarea);
+});
+
+// Actualizar una tarea
+app.put('/api/tareas/:id', (req, res) => {
+  const { id } = req.params;
+  const { nombre } = req.body;
+  const index = tareas.findIndex((t) => t.id === parseInt(id));
+
+  if (index !== -1) {
+    tareas[index].nombre = nombre;
+    res.json(tareas[index]);
+  } else {
+    res.status(404).json({ mensaje: 'Tarea no encontrada' });
+  }
+});
+
+// Eliminar una tarea
+app.delete('/api/tareas/:id', (req, res) => {
+  const { id } = req.params;
+  tareas = tareas.filter((t) => t.id !== parseInt(id));
+  res.json({ mensaje: 'Tarea eliminada' });
+});
+
+// Iniciar el servidor
+app.listen(port, () => {
+  console.log(`Servidor corriendo en http://localhost:${port}`);
+});
